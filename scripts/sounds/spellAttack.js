@@ -7,3 +7,6 @@ function isSpellAttack(msg){
     return false
 }
   
+function isMagicalDamage(msg){
+    return false
+}

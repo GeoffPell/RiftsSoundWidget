@@ -1,4 +1,4 @@
-import * as utils from "./utils.js";
+// import * as utils from "./utils.js";
 
 export function isMeleeWeapon(msg){    
     var weapons = ['sword', 'axe', 'dagger', 'hammer'];
@@ -9,14 +9,28 @@ export function isMeleeWeapon(msg){
     return false
 }
 
-export function handleMeleeSound(message){
-    var alias = isWeapon(message['speaker']['alias'])
-    var male = isMasculineChar(alias)
-
-    playSound("1496009")
+export async function handleMeleeSound(message, hitDetail){
+    var alias = isMeleeWeapon(message['speaker']['alias'])
+    // var male = isMasculineChar(alias)
+    console.log("message: " + message) 
     
     // is hit
-    // is miss
-    // is fumble
-    // is crit
+    if (hitDetail.hit){
+        
+        // is crit?
+
+
+        playSound("1496009")
+    } else if (hitDetail.fumble) {
+        // is fumble
+        playSound("1497024")
+    } else if (!hitDetail.hit) {
+        // is miss
+        playSound("1497020")
+    }
+    
+}
+
+export function isPhysicalDamage(msg){
+    return true
 }

@@ -1,13 +1,15 @@
-import * as melee from "./meleeWeapon.js";
-import * as ranged from "./rangedWeapon.js";
-import * as spellAttack from "./spellAttack.js";
-import * as spellUtil from "./spellUtil.js";
+import {isMeleeWeapon} from "./sounds/meleeWeapon.js";
+import {handleMeleeSound} from "./sounds/meleeWeapon.js";
+import { isPhysicalDamage } from "./sounds/meleeWeapon.js"; 
+import * as utils from "./sounds/utils.js";
+import * as ranged from "./sounds/rangedWeapon.js";
+import * as spellAttack from "./sounds/spellAttack.js";
+import * as spellUtil from "./sounds/spellUtil.js";
 
-var authToken = ""
 
 var ready = false
 var load_time = Date.now ()
-var last_id
+var last_id = []
 
 
 
@@ -54,12 +56,9 @@ Hooks.on("renderChatMessage", (message, data, html) => {
     }
 
     if (!ready){
-        // console.log("load_time" + load_time)
-        // console.log("Date.now ()" + Date.now ())
         if (Date.now () >= (load_time + 5000)) {
             ready = true
         } else {
-            // console.log("bounce")
             return
         }
     }
@@ -67,56 +66,100 @@ Hooks.on("renderChatMessage", (message, data, html) => {
     // console.log("HELLO renderChatMessage " + typeof(message))
     console.log("message." + JSON.stringify(message));
     // console.log("data." + JSON.stringify(data));
-    
-
     var parsed = JSON.parse(JSON.stringify(message));
-    if (parsed._id == last_id){
-        return 
-    }
-
-    last_id = parsed._id
-
     considerCombatMessage(parsed)
   });
 
 
+function getHitDetail(message){
+    var hitDetail = {}
+    if (message['flags'] != null){
+        if (message['flags']['midi-qol'] != null){
+            console.log("hit:" + hit)
+            if (message['flags']['midi-qol']['isHit'] != null){
+                var hit = message['flags']['midi-qol']['isHit']
+                var fumble = message['flags']['midi-qol']['isFumble']
+                console.log("hit:" + hit)
+                hitDetail = {hit: hit, fumble: fumble}
+            } 
+        }
+    }
+    return hitDetail
+}
 
-function considerCombatMessage(message){
-    // if (message['flags']['midi-qol']){
 
-    // }
+function getDamageDetailMessage(message){
+    var damageDetail = {}
+    if (message['flags'] != null){
+        if (message['flags']['midiqol'] != null){
+            if (message['flags']['midiqol']['undoDamage'] != null){
+                if (message['flags']['midiqol']['undoDamage'][0]['damageItem'] != null){
+                    var damageItem = message['flags']['midiqol']['undoDamage'][0]['damageItem']
+                    var damageItemParsed = JSON.parse(JSON.stringify(damageItem))
+                    damageDetail = JSON.parse(JSON.stringify(damageItemParsed.damageDetail[0][0]))
+                    var type = damageDetail.type;
+                    // console.log("type:" + type)
+                }
+            } 
+        }
+    }
+    return damageDetail
+}
+
+
+export async function considerCombatMessage(message){      
+    var hitDetail = getHitDetail(message)
+
+    if (!isObjectEmpty(hitDetail)){
+        return
+    }
+
+    if (last_id.includes(message._id)){
+        return 
+    }
+    last_id.push(message._id)
+    if (last_id.length > 3){
+        last_id.unshift()
+    }
+
+
     
-    // console.log("flavor " + message['flavor'])
+    var damageDetail = getDamageDetailMessage(message)
+    
+    console.log("hitDetail " + JSON.stringify(hitDetail))
+    console.log("damageDetail " + JSON.stringify(damageDetail))
     var flavor = message['flavor']
     if (flavor != null){
         
         if (isMeleeWeapon(flavor)){
-            handleMeleeSound(message)            
-        } else if (isRangedWeapon(flavor)){
+            setTimeout(() => {handleMeleeSound(message, hitDetail);}, 0)
+                        
+        // } else if (isRangedWeapon(flavor)){
 
-        } else if (isSpellAttack(flavor)){
+        // } else if (isSpellAttack(flavor)){
 
-        } else if (isSpellUtil(flavor)){
+        // } else if (isSpellUtil(flavor)){
 
         }
 
         return
     }
 
-    alias = isWeapon(message['speaker']['alias'])
+    // var alias = message['speaker']['alias']
 
     // is damage roll
-    var dmgroll_sig = ""
-    if (dmgroll_sig != null){
-        if (isPhysicalDamage(dmgroll_sig)){
+    if (!isObjectEmpty(damageDetail)){        
+        // if (isPhysicalDamage(damageDetail.type)){
+            playSound("1497021")
             // normal
             // crit
-        } else if (isMagicalDamage()){
-            // single
-            // multi
-        } else {
-
-        }
+        // } else if (isMagicalDamage(damageDetail.type)){
+        //     // single
+        //     // multi
+        // } else {
+        // }
+    } else {
+        playSound("1497020")
     }
 
 
