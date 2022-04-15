@@ -21,16 +21,8 @@
     
   ],
   "esmodules": [
-    "scripts/module.js",
-    "scripts/sounds/meleeWeapon.js"
-    
-  ],
-  "scripts": [    
-    "scripts/sounds/rangedWeapon.js",
-    "scripts/sounds/spellAttack.js",
-    "scripts/sounds/meleeWeapon.js",
-    "scripts/sounds/utils.js"
-  ],
+    "scripts/module.js"    
+  ],  
   "styles": [
     "styles/module.css"
   ],

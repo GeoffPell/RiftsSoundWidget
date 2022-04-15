@@ -1,3 +1,6 @@
+import { playSound } from "../utils.js";
+import { msgContains } from "../utils.js";
+
 function isSpellAttack(msg){    
     var weapons = ['acid splash'];
     var recived = msg;
@@ -7,6 +10,7 @@ function isSpellAttack(msg){
     return false
 }
   
-function isMagicalDamage(msg){
-    return false
+export function isMagicalDamage(msg){
+    var possibles = ['poison', 'fire', 'cold', 'force', 'lightning', 'thunder', 'necrotic', 'psychic', 'radiant']; 
+    return msgContains(msg, possibles)
 }
