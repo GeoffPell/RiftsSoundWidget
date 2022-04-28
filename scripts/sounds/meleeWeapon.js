@@ -34,13 +34,13 @@ export function isMeleeDamage(msg){
     return false
 }
 
-export async function handleMeleeSwoosh(itemName, fumble){
+export async function handleMeleeSwoosh(weaponName, weaponType, fumble, targetDetail){
     
-    if (isSlashingSound(itemName)){
+    if (isSlashingSound(weaponName)){
         playSound(sounds.sound_combat_long_blade_slash)
-    } else if (isPoleArm(itemName)) {
+    } else if (isPoleArm(weaponName)) {
         playSound(sounds.pole_arm_slash)
-    } else if (isBludgeon(itemName)) {
+    } else if (isBludgeon(weaponName)) {
         playSound(sounds.sound_combat_bludgeonSwing)
     } else {
         playSound(sounds.gemeric_slash)
@@ -51,33 +51,37 @@ export async function handleMeleeSwoosh(itemName, fumble){
     }
 }
 
-export async function handleMeleeDamage(itemName, crit, fumble){
-    if (crit){
-        playSound(sounds.sound_combat_long_blade_crit)
+export async function handleMeleeDamage(weaponName, weaponType, damageDetail, damageValue, critical, targetDetail){
+
+    damageDetail = damageDetail.parts[0][1]
+    console.log("idamageDetail: " + damageDetail); 
+
+    if (critical){
+        // playSound(sounds.sound_combat_long_blade_crit)
         playSound(sounds.critical_hit_decoration)
     }
 
     // is hit
-    if (damageDetail.damage >= 0){
-        if (isSlashingSound(flavor)){
-            if (crit){
+    if (damageValue >= 0){
+        if (isSlashingSound(weaponName)){
+            if (critical){
                 playSound(sounds.sound_combat_long_blade_crit)
             } else {
                 playSound(sounds.sound_combat_long_blade_hit)            
             }
 
-        } else if (isPoleArm(flavor)) {
+        } else if (isPoleArm(weaponName)) {
 
-            if (crit){
+            if (critical){
                 playSound(sounds.sound_combat_long_blade_crit)
             } else {
                 playSound(sounds.sound_combat_long_blade_hit)            
             }
 
             playSound(sounds.sound_combat_short_blade_hit)
-        } else if (isBludgeon(flavor)) {
+        } else if (isBludgeon(weaponName)) {
 
-            if (crit){
+            if (critical){
                 playSound(sounds.sound_combat_long_blade_crit)
             } else {
                 playSound(sounds.sound_combat_long_blade_hit)            

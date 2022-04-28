@@ -24,11 +24,8 @@ import * as sounds from './syrinSounds.js';
 //     return isRangedWeapon(msg)
 // }
   
-export async function handleMagicAtack(message, hitDetail){
-    // var alias = isRangedWeapon(message['speaker']['alias'])
-    var flavor = message["flavor"].toLowerCase()
-
-    switch (flavor){
+export async function handleMagicAttack(spellName, school, fumble, targetDetail){
+    switch (spellName){
         case "eldritch blast":
             playSound(sounds.eldritch_blast)
             break;
@@ -38,25 +35,23 @@ export async function handleMagicAtack(message, hitDetail){
             break;
     }
     
-    if (hitDetail.fumble) {
+    if (fumble) {
         playSound(sounds.sound_combat_automaticMiss)
     }
 }
 
-export async function handleMagicDamage(message, damageDetail, hitDetail){
-    // var alias = isMeleeWeapon(message['speaker']['alias'])
-    var flavor = message["flavor"]
+export async function handleMagicDamage(spellName, school, damageDetail, damageValue, critical, targetDetail){
 
-    var isCrit = false
-    if (hitDetail != null && hitDetail.crit){
-        isCrit = true
+    damageDetail = damageDetail.parts[0][1]
+    console.log("idamageDetail: " + damageDetail); 
+
+    if (critical){
         playSound(sounds.destruction)
         playSound(sounds.critical_hit_decoration)
-        return
     }
 
     // is hit
-    if (damageDetail.damage >= 0){
+    if (damageValue >= 0){
         playSound(sounds.sound_combat_humanoidGrunt)
     } else {
         // immune?

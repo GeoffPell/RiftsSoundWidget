@@ -18,37 +18,36 @@ export function isRangedDamage(msg){
     return isRangedWeapon(msg)
 }
   
-export async function handleRangedSwoosh(message, hitDetail){
-    // var alias = isRangedWeapon(message['speaker']['alias'])
-    var flavor = message["flavor"]
+export async function handleRangedSwoosh(weaponName, weaponType, fumble, targetDetail){    
     
-    if (isBowSound(flavor)){
+    if (isBowSound(weaponName)){
         playSound(sounds.sound_combat_bowFire)
     } else {
         playSound(sounds.sound_combat_throw)
     }
     
-    if (hitDetail.fumble) {
+    if (fumble) {
         playSound(sounds.sound_combat_automaticMiss)
     }
 }
 
-export async function handleRangedDamage(message, damageDetail, hitDetail){
-    // var alias = isMeleeWeapon(message['speaker']['alias'])
-    var flavor = message["flavor"]
+export async function handleRangedDamage(weaponName, weaponType, damageDetail, damageValue, critical, targetDetail){
 
-    var isCrit = false
-    if (hitDetail != null && hitDetail.crit){
-        isCrit = true
-        playSound(sounds.sound_combat_bowCrit)
+    damageDetail = damageDetail.parts[0][1]
+    console.log("idamageDetail: " + damageDetail); 
+
+    if (critical){
         playSound(sounds.critical_hit_decoration)
-        return
     }
 
     // is hit
-    if (damageDetail.damage >= 0){
-        if (isBowSound(flavor)){
-            playSound(sounds.sound_combat_bowHitFlesh)   
+    if (damageValue >= 0){
+        if (isBowSound(weaponName)){
+            if (critical){
+                playSound(sounds.sound_combat_bowCrit)
+            } else {
+                playSound(sounds.sound_combat_bowHitFlesh)
+            }
         } else {
             playSound(sounds.sound_combat_hitFlesh)
         }
