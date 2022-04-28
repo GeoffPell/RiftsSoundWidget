@@ -18,7 +18,7 @@ export const registerSettings = function () {
       config: true
     });
   
-    game.settings.register(packageId, "migration", {
+    game.settings.register(packageId, "Feminine PCs", {
       name: "CombatIds",
       default: [],
       scope: "client",
@@ -33,12 +33,3 @@ var femaleChars = []
 
 
 
-
-//
-var sound_event_levelUp = ""
-var sound_event_LongRest = ""
-var sound_event_ShortRest = ""
-var sound_event_partyXp = ""
-//
-var sound_skill_Fail = ""
-var sound_skill_Save = ""

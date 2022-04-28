@@ -1,134 +1,71 @@
 import { registerSettings } from "./settings.js";
 // import { registerHooks } from "./hooks.js";
 import { packageId } from "./config.js";
+import { isObjectEmpty } from "./utils.js";
 //
 import { isMeleeWeapon } from "./sounds/meleeWeapon.js";
 import { handleMeleeSwoosh } from "./sounds/meleeWeapon.js";
 import { handleMeleeDamage } from "./sounds/meleeWeapon.js";
-import { isPhysicalDamage } from "./sounds/meleeWeapon.js"; 
-import { playSound } from "./utils.js";
-import { isObjectEmpty } from "./utils.js";
+import { isMeleeDamage } from "./sounds/meleeWeapon.js"; 
 
-import { quePushIdWithDmg } from "./messageQue.js";
-import { quePushIdWithAtk } from "./messageQue.js";
-import { queHasIdWithDmg } from "./messageQue.js";
-import { queHasIdWithAtk } from "./messageQue.js";
+import { isRangedWeapon } from "./sounds/rangedWeapon.js";
+import { isRangedDamage } from "./sounds/rangedWeapon.js";
+import { handleRangedSwoosh } from "./sounds/rangedWeapon.js";
+import { handleRangedDamage } from "./sounds/rangedWeapon.js";
+
+import { handleMagicAtack } from "./sounds/spellAttack.js";
+import { handleMagicDamage } from "./sounds/spellAttack.js";
+
 
 // import * as ranged from "./sounds/rangedWeapon.js";
 // import * as spellAttack from "./sounds/spellAttack.js";
 // import * as spellUtil from "./sounds/spellUtil.js";
 
 
-var ready = false
-var load_time = Date.now ()
-var last_id = []
 
 Hooks.once("init", function () {
     registerSettings();
 })
 
 
-Hooks.on("renderChatMessage", (message, data, html) => {
-    if (!game.user.isGM){
-        return
-    }
 
-    if (!ready){
-        if (Date.now () >= (load_time + 5000)) {
-            ready = true
-        } else {
-            return
-        }
-    }
-    
-    // console.log("HELLO renderChatMessage " + typeof(message))
-    // console.log("message." + JSON.stringify(message));
-    // console.log("data." + JSON.stringify(data));
-    var parsed = JSON.parse(JSON.stringify(message));
-    considerCombatMessage(parsed)
-  });
+Hooks.on("midi-qol.AttackRollComplete", workflow => {
+    console.log("AttackRollComplete")
+    console.log("isCritical: " + workflow.isCritical);
+    console.log("isFumble: " + workflow.isFumble);
+    console.log("hitTargets: " + workflow.hitTargets);
+});
 
+Hooks.on("midi-qol.preDamageRoll", workflow => {
+    console.log("preDamageRoll")
+    console.log("hitTargets: " + workflow.hitTargets);
+    console.log("itemId: " + workflow.itemId);
 
-function getHitDetail(message){
-    var hitDetail = {}
-    if (message['flags'] != null){
-        if (message['flags']['midi-qol'] != null){
-            if (message['flags']['midi-qol']['isHit'] != null){
-                var hit = message['flags']['midi-qol']['isHit']
-                var fumble = message['flags']['midi-qol']['isFumble']
-                var crit = false
-                if (message['flags']['midi-qol']['isCritical'] != null){
-                    crit = true
-                } 
-                hitDetail = {hit: hit, fumble: fumble, crit: crit}
-            } 
-        }
-    }
-    return hitDetail
-}
+    console.log("itemCardData: " + JSON.stringify(workflow.itemCardData));
+    console.log("item: " + JSON.stringify(workflow.item));
+    console.log("item.name: " + JSON.stringify(workflow.item.name));
+    console.log("item.name: " + workflow.item.name); //Lopngsword, blast
+    console.log("item.type: " + workflow.type); //spell, item
+});
 
 
-function getDamageDetailMessage(message){
-    var damageDetail = {}
-    if (message['flags'] != null){
-        if (message['flags']['midi-qol'] != null){
-            if (message['flags']['midi-qol']['damageDetail'] != null){
-                var damageDetail = message['flags']['midi-qol']['damageDetail'][0]
-                var damageDetailParsed = JSON.parse(JSON.stringify(damageDetail))
-                damageDetail = JSON.parse(JSON.stringify(damageDetailParsed))
-            } 
-        }
-    }
-    return damageDetail
-}
-
-
-export async function considerCombatMessage(message){      
-
-    var hitDetail = getHitDetail(message)
-    var damageDetail = getDamageDetailMessage(message)
-
-    if (isObjectEmpty(hitDetail) && isObjectEmpty(damageDetail)){
-        return
-    }
-
-
-    if (!isObjectEmpty(hitDetail)){
-        if (!queHasIdWithAtk(message._id)){
-            quePushIdWithAtk(message._id)
-            handleAttackSound(message, hitDetail)
-        }
-    } 
-
-    if (!isObjectEmpty(damageDetail)){
-        if (!queHasIdWithDmg(message._id)){
-            quePushIdWithDmg(message._id)
-            handleDamageSound(message, damageDetail, hitDetail)
-        }
-    } 
-
-
-    // var alias = message['speaker']['alias']
-
-
-    var save_or_skill = ""
-    if (save_or_skill != null){
-        // pass
-        // fail
-        // crit
-        // fumble
-    }
-}
 
 
 function handleDamageSound(message, damageDetail, hitDetail){
+    var flavor = message['flavor']
+    console.log("flavor " + flavor)
     if (!isObjectEmpty(damageDetail)){        
-        if (isPhysicalDamage(damageDetail.type)){
+        if (isMeleeDamage(flavor)){
             handleMeleeDamage(message, damageDetail, hitDetail);
-        // } else if (isMagicalDamage(damageDetail.type)){
-        //     // single
-        //     // multi
-        // } else {
+        } else if (isRangedDamage(flavor)){
+            // console.log("isRangedDamage")
+            handleRangedDamage(message, damageDetail, hitDetail);
+        } else {
+            // single
+            // multi
+            console.log("handleMagicDamage")
+            handleMagicDamage(message, damageDetail, hitDetail)
+            // } else {
         }
     } else {
         // console.log("no damage - is it fumble?: " + hitDetail.fumble)
@@ -140,20 +77,12 @@ function handleAttackSound(message, hitDetail){
     var flavor = message['flavor']
     if (flavor != null){
         if (isMeleeWeapon(flavor)){
-            handleMeleeSwoosh(message, hitDetail)
-            
-            if (!hitDetail.isHit){
-                // setTimeout(() => {handleMeleeSwoosh(message, hitDetail);}, 2000)
-            }
-                        
-        // } else if (isRangedWeapon(flavor)){
-
-        // } else if (isSpellAttack(flavor)){
-
-        // } else if (isSpellUtil(flavor)){
-
+            handleMeleeSwoosh(message, hitDetail)                        
+        } else if (isRangedWeapon(flavor)){
+            handleRangedSwoosh(message, hitDetail)     
         } else {
-            console.log("not melee")
+            console.log("handleMagicAtack")
+            handleMagicAtack(message, hitDetail)
         }
         return
     }
