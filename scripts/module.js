@@ -51,9 +51,37 @@ function getTargetDetail(workflow){
     return targetDetail
 }
 
-Hooks.on("midi-qol.AttackRollComplete", workflow => {
-    console.log("AttackRollComplete")
+Hooks.on("midi-qol.preSave", workflow => {
+    console.log("preSave")
 });
+
+
+Hooks.on("midi-qol.preDamageRoll", workflow => {
+    console.log("preDamageRoll")
+});
+
+Hooks.on("midi-qol.damageRollComplete", workflow => {
+    console.log("damageRollComplete")
+
+});
+
+Hooks.on("midi-qol.preApplyDynamicEffects", workflow => {
+    // console.log("preApplyDynamicEffects")
+
+    // if (workflow.item.type == "spell"){
+    //     console.log("item.data.level: " + workflow.item.data.data.level); 
+    //     console.log("item.data.school: " + workflow.item.data.data.school); 
+    // }
+
+    if (workflow.item.type == 'spell'){
+        var targetDetail = getTargetDetail(workflow)
+        // if (workflow.item.name == "toll the dead"){
+            handleMagicAttack(workflow.item.name, workflow.item.data.data.school, workflow.isFumble, targetDetail)
+        // }
+        handleMagicDamage(workflow.item.name,  workflow.item.data.data.school, workflow.item.data.data.damage, workflow.damageTotal, workflow.isCritical, targetDetail)
+    }
+});
+
 
 Hooks.on("midi-qol.AttackRollComplete", workflow => {
     // console.log("AttackRollComplete")
@@ -64,7 +92,7 @@ Hooks.on("midi-qol.AttackRollComplete", workflow => {
 
     // console.log("item.name: " + workflow.item.name); //Lopngsword, blast
     // console.log("item.type: " + workflow.item.type); //spell, item
-    // if (workflow.type == "spell"){
+    // if (workflow.item.type== "spell"){
     //     console.log("item.data.level: " + workflow.item.data.level); 
     //     console.log("item.data.school: " + workflow.item.data.school); 
     // }
@@ -73,7 +101,7 @@ Hooks.on("midi-qol.AttackRollComplete", workflow => {
     
     // console.log("targetDetails: " + targetDetails); 
     var targetDetail = getTargetDetail(workflow)
-
+    // console.log("item.type: " + workflow.item.type);
 
     if (workflow.item.type == 'weapon'){
         console.log("item.data.weaponType: " + workflow.item.data.data.weaponType);
@@ -83,25 +111,27 @@ Hooks.on("midi-qol.AttackRollComplete", workflow => {
             handleRangedSwoosh(workflow.item.name, workflow.item.data.data.weaponType, workflow.isFumble, targetDetail);
         }
     } else if (workflow.item.type == 'spell'){
-        handleMagicAttack(workflow.item.name, workflow.item.data.data.weaponType, workflow.isFumble, targetDetail)
+        if (Array.from(workflow.hitTargets).length == 0){
+            handleMagicAttack(workflow.item.name, workflow.item.data.data.school, workflow.isFumble, targetDetail)
+        }
     }
 });
 
-Hooks.on("midi-qol.preDamageRoll", workflow => {
-    console.log("preDamageRoll")
+Hooks.on("midi-qol.preDamageRollComplete", workflow => {
+    // console.log("preDamageRollComplete")
 
     // console.log("isCritical: " + workflow.isCritical);
     // console.log("isFumble: " + workflow.isFumble);
-    // // console.log("hitTargets: " + JSON.stringify(workflow.hitTargets));
+    // console.log("damageTotal: " + JSON.stringify(workflow.damageTotal));
     // console.log("itemId: " + workflow.itemId);
 
-    // console.log("item: " + JSON.stringify(workflow.item));
+    // console.log("workflow.item.data: " + JSON.stringify(workflow.item.data.data));
     // console.log("item.name: " + workflow.item.name); //Longsword, blast
     // console.log("item.type: " + workflow.item.type); //spell, item
 
     // if (workflow.item.type == "spell"){
-    //     console.log("item.data.level: " + workflow.item.data.level); 
-    //     console.log("item.data.school: " + workflow.item.data.school); 
+    //     console.log("item.data.level: " + workflow.item.data.data.level); 
+    //     console.log("item.data.school: " + workflow.item.data.data.school); 
     // }
 
     // if (workflow.item.type == "weapon"){
@@ -116,15 +146,15 @@ Hooks.on("midi-qol.preDamageRoll", workflow => {
     if (workflow.item.type == 'weapon'){
         // console.log("item.data.weaponType: " + workflow.item.data.data.weaponType);
         if (workflow.item.data.data.weaponType != "Ranged"){
-            handleMeleeDamage(workflow.item.name, workflow.item.data.data.weaponType, workflow.item.data.data.damage, 1, workflow.isCritical, targetDetail)
+            handleMeleeDamage(workflow.item.name, workflow.item.data.data.weaponType, workflow.item.data.data.damage, workflow.damageTotal, workflow.isCritical, targetDetail)
         } else {
-            handleRangedDamage(workflow.item.name, workflow.item.data.data.weaponType, workflow.item.data.data.damage, 1, workflow.isCritical, targetDetail);
+            handleRangedDamage(workflow.item.name, workflow.item.data.data.weaponType, workflow.item.data.data.damage, workflow.damageTotal, workflow.isCritical, targetDetail);
         }
     }
 
-    if (workflow.item.type == 'spell'){
-        handleMagicDamage(workflow.item.name,  workflow.item.data.school, workflow.item.data.data.damage, 1, workflow.isCritical, targetDetail)
-    }
+    // if (workflow.item.type == 'spell'){
+    //     handleMagicDamage(workflow.item.name,  workflow.item.data.school, workflow.item.data.data.damage, workflow.damageTotal, workflow.isCritical, targetDetail)
+    // }
 
 });
 

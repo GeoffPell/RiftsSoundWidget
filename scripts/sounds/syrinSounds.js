@@ -155,3 +155,20 @@ export var sound_wasps_insect_spell = "225392"
 
 export var destruction = "4395"
 
+//----------
+export var cleric_level_0 = "415624"
+
+export var warlock_level_1 = "618109"
+export var warlock_level_3 = "618111"
+
+export var wizard_level_4 = "415544"
+
+
+export var warlock_hypnotic_pattern = "618123"
+
+
+export var sorc_level_2 = "595697"
+export var sorc_level_6 = "595693"
+
+
+export var paladin_level_3 = "530121"
