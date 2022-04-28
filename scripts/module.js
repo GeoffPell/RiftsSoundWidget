@@ -34,18 +34,70 @@ Hooks.on("midi-qol.AttackRollComplete", workflow => {
     console.log("isCritical: " + workflow.isCritical);
     console.log("isFumble: " + workflow.isFumble);
     console.log("hitTargets: " + workflow.hitTargets);
+    console.log("JSONhitTargets: " + JSON.stringify(workflow.hitTargets));
+
+    console.log("item.name: " + workflow.item.name); //Lopngsword, blast
+    console.log("item.type: " + workflow.item.type); //spell, item
+    if (workflow.type == "spell"){
+        console.log("item.data.level: " + workflow.item.data.level); 
+        console.log("item.data.school: " + workflow.item.data.school); 
+    }
+
+
+    const targetDetails = workflow.item.data.data.target
+    console.log("targetDetails: " + targetDetails); 
+
+    if (Array.from(workflow.hitTargets).length >= 1){
+
+        // console.log("targetDetails: " + JSON.stringify(targetDetails)); 
+        console.log("hitTargets data: " + Array.from(workflow.hitTargets)[0].data);
+        console.log("hitTargets name: " + Array.from(workflow.hitTargets)[0].data.name);
+        let JSONactorId = JSON.stringify(Array.from(workflow.hitTargets)[0].data)
+        console.log(JSONactorId);
+
+        let actorId = Array.from(workflow.hitTargets)[0].data.actorId
+        console.log(actorId);
+
+        let actor = game.actors.get(actorId);
+        let creatureType = actor.labels.creatureType;
+        let cr = actor.data.data.details.cr;
+        let size = actor.data.data.traits.size;
+        console.log("creatureType: " + creatureType);
+        console.log("cr: " + cr);
+        console.log("size: " + size);
+    }
+
+    if (workflow.item.type == 'item'){
+        handleMeleeSwoosh(workflow.item.name, workflow.isFumble)
+    }
+
+
+
+    // console.log([...letters]) 
+    // const firstTarget = this.targets.values().next().value
+    // console.log("firstTarget.actor: " + firstTarget.actor); 
 });
 
 Hooks.on("midi-qol.preDamageRoll", workflow => {
     console.log("preDamageRoll")
-    console.log("hitTargets: " + workflow.hitTargets);
+    // console.log("hitTargets: " + JSON.stringify(workflow.hitTargets));
     console.log("itemId: " + workflow.itemId);
 
-    console.log("itemCardData: " + JSON.stringify(workflow.itemCardData));
     console.log("item: " + JSON.stringify(workflow.item));
-    console.log("item.name: " + JSON.stringify(workflow.item.name));
     console.log("item.name: " + workflow.item.name); //Lopngsword, blast
-    console.log("item.type: " + workflow.type); //spell, item
+    console.log("item.type: " + workflow.item.type); //spell, item
+    if (workflow.item.type == "spell"){
+        console.log("item.data.level: " + workflow.item.data.level); 
+        console.log("item.data.school: " + workflow.item.data.school); 
+    }
+
+    if (workflow.item.type == "item"){
+        console.log("item.data.weaponType: " + workflow.item.data.data.weaponType);
+    }
+
+    console.log("item.data.range: " + workflow.item.data.data.range.value); 
+    console.log("item.data.damage: " + workflow.item.data.data.damage.parts[0][1]); 
+
 });
 
 
