@@ -172,3 +172,21 @@ export var sorc_level_6 = "595693"
 
 
 export var paladin_level_3 = "530121"
+
+
+
+//
+export var triggerTrap_mech = "17217"
+export var triggerTrap_gas = "1070448"
+export var triggerTrap_dart = "1031609"
+
+export var destroyTools = "1497024"
+export var showDoor = "1496037"
+export var openDoor = "1496017"
+export var foundTrap = "1496037"
+export var examinItem = ""
+export var breakLock_Fail = "1496048"
+export var breakLock_Success = "1836569"
+export var pickLock_Fail = "1022914" //1496056
+export var pickLock_Success = "1496057"
+export var chest_open = "1022915"

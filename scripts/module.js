@@ -16,7 +16,8 @@ import { handleRangedDamage } from "./sounds/rangedWeapon.js";
 import { handleMagicAttack } from "./sounds/spellAttack.js";
 import { handleMagicDamage } from "./sounds/spellAttack.js";
 
-
+import { playSound } from "./utils.js";
+import * as sounds from './sounds/syrinSounds.js';
 // import * as ranged from "./sounds/rangedWeapon.js";
 // import * as spellAttack from "./sounds/spellAttack.js";
 // import * as spellUtil from "./sounds/spellUtil.js";
@@ -24,6 +25,7 @@ import { handleMagicDamage } from "./sounds/spellAttack.js";
 
 
 Hooks.once("init", function () {
+    console.log("HELELELLELEELELELELELELEELEL"); 
     registerSettings();
 })
 
@@ -51,18 +53,67 @@ function getTargetDetail(workflow){
     return targetDetail
 }
 
-Hooks.on("midi-qol.preSave", workflow => {
-    console.log("preSave")
+
+// ------------ innocenti-openlock ------------
+Hooks.on("innocenti-openlock.triggerTrap", async function () {
+    console.log("triggerTrap")
+    playSound(sounds.triggerTrap_dart)     
+});
+
+Hooks.on("innocenti-openlock.destroyTools", async function () {
+    console.log("destroyTools")
+    playSound(sounds.destroyTools)     
+});
+
+Hooks.on("innocenti-openlock.showDoor", async function () {
+    console.log("showDoor")
+    playSound(sounds.showDoor)     
+});
+Hooks.on("innocenti-openlock.openDoor", async function () {
+    console.log("openDoor")
+    playSound(sounds.openDoor)     
+});
+Hooks.on("innocenti-openlock.foundTrap", async function () {
+    console.log("foundTrap")
+    playSound(sounds.foundTrap)     
+});
+Hooks.on("innocenti-openlock.examinItem", async function () {
+    console.log("examinItem")
+    playSound(sounds.examinItem)     
+});
+
+Hooks.on("innocenti-openlock.breakLock_Success", async function () {
+    console.log("breakLock_Success")
+    playSound(sounds.breakLock_Success)     
+});
+Hooks.on("innocenti-openlock.breakLock_Fail", async function () {
+    console.log("breakLock_Fail")
+    playSound(sounds.breakLock_Fail)     
 });
 
 
+Hooks.on("innocenti-openlock.pickLock_Success", async function () {
+    console.log("pickLock_Success")
+    playSound(sounds.pickLock_Success)   
+    playSound(sounds.chest_open, 1000)   
+    
+});
+Hooks.on("innocenti-openlock.pickLock_Fail", async function () {
+    console.log("pickLock_Fail")
+    playSound(sounds.pickLock_Fail)     
+});
+
+
+
+
+// ------------ END innocenti-openlock ------------
+
 Hooks.on("midi-qol.preDamageRoll", workflow => {
-    console.log("preDamageRoll")
+
 });
 
 Hooks.on("midi-qol.damageRollComplete", workflow => {
-    console.log("damageRollComplete")
-
+    //console.log("damageRollComplete")
 });
 
 Hooks.on("midi-qol.preApplyDynamicEffects", workflow => {
